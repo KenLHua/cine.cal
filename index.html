@@ -768,12 +768,11 @@ function renderMonth() {
           ? `<img src="${entry.poster}" alt="${entry.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=poster-placeholder>🎬</div>'">`
           : `<div class="poster-placeholder">🎬</div>`;
 
-        const reviewIcon = entry.hasReview ? `<div class="review-icon">💬</div>` : '';
         
         moviesHTML += `
           <div class="movie-thumb" onclick="window.open('${entry.link}', '_blank')">
             ${imgTag}
-            ${reviewIcon}
+            <div class="review-icon">💬</div>
             <div class="movie-label">
               ${entry.title}
               ${stars ? `<div class="rating-stars">${stars}</div>` : ''}
