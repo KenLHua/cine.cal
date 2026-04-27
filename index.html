@@ -112,15 +112,15 @@
     align-items: center;
     justify-content: center;
     gap: 24px;
-    padding: 36px 48px 0;
+    padding: 16px 48px 0;
   }
 
   .month-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 2.8rem;
+    font-size: 1.9rem;
     font-style: italic;
     letter-spacing: -1px;
-    min-width: 320px;
+    min-width: 260px;
     text-align: center;
   }
 
@@ -145,7 +145,7 @@
   .stats-bar {
     display: flex;
     gap: 32px;
-    padding: 20px 48px 0;
+    padding: 10px 48px 0;
     justify-content: center;
   }
   .stat {
@@ -169,7 +169,7 @@
 
   /* ── Calendar (Month View) ── */
   .calendar-wrap {
-    padding: 32px 48px 64px;
+    padding: 14px 48px 20px;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -196,14 +196,12 @@
     gap: 6px;
   }
 
-  /* ── Poster-shaped cells: ~2:3 ratio ── */
   .cal-cell {
-    /* Aspect ratio close to a movie poster (2:3) */
-    aspect-ratio: 2 / 3;
+    aspect-ratio: 3 / 4;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 8px 6px 6px;
+    padding: 6px 5px 5px;
     position: relative;
     transition: border-color 0.2s, transform 0.15s;
     overflow: hidden;
@@ -232,23 +230,29 @@
   }
   .cal-cell.today .day-num { color: var(--accent2); font-weight: 500; }
 
+  /* UPDATED: Stack is now a grid that adjusts based on count */
   .movie-poster-stack {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 4px;
     flex: 1;
     min-height: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
   }
 
-  /* Primary poster fills the remaining cell height */
+  /* Change grid layout based on movie count */
+  .movie-poster-stack.count-2 { grid-template-rows: 1fr 1fr; }
+  .movie-poster-stack.count-3 { grid-template-rows: 1fr 1fr 1fr; }
+  .movie-poster-stack.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
   .movie-thumb {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s;
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    height: 100%;
   }
   .movie-thumb:hover { transform: scale(1.03); z-index: 10; }
   .movie-thumb img {
@@ -263,8 +267,8 @@
     bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, rgba(0,0,0,0.92));
     padding: 18px 5px 5px;
-    font-size: 0.58rem;
-    line-height: 1.25;
+    font-size: 0.52rem;
+    line-height: 1.2;
     color: #fff;
     opacity: 0;
     transition: opacity 0.2s;
@@ -276,59 +280,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    font-size: 1.2rem;
   }
 
   .rating-stars {
-    font-size: 0.5rem;
-    color: var(--accent);
-    margin-top: 2px;
-    letter-spacing: -1px;
-  }
-
-  /* Second/more movies as a small filmstrip at bottom */
-  .extra-films {
-    display: flex;
-    gap: 3px;
-    flex-shrink: 0;
-    margin-top: 3px;
-  }
-  .extra-thumb {
-    flex: 1;
-    aspect-ratio: 2/3;
-    border-radius: 3px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: border-color 0.2s;
-    position: relative;
-  }
-  .extra-thumb:hover { border-color: var(--accent); }
-  .extra-thumb img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .extra-thumb .extra-placeholder {
-    width: 100%; height: 100%;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-  }
-  .more-badge-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.55rem;
-    font-family: 'DM Mono', monospace;
-    color: #fff;
-    font-weight: 500;
-  }
+    font-size: 0.45rem; /* Base size when not hovered (if visible) */
+  color: var(--accent);
+  margin-top: 2px;
+  letter-spacing: -1px;
+  transition: font-size 0.2s ease; /* Smooth transition for the size change */
+}
+.movie-thumb:hover .rating-stars {
+  font-size: 0.9rem; /* Increased size on hover */
+  letter-spacing: 0px; /* Adjust spacing so larger stars don't overlap too much */
+  margin-top: 4px;
+}
 
   /* ── Year View ── */
   .year-view-wrap {
@@ -611,7 +577,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <button class="close-btn" onclick="closeModal()">✕</button>
@@ -635,7 +600,7 @@ const PROXIES = [
 
 let allEntries = [];
 let currentYear, currentMonth;
-let currentView = 'month'; // 'month' | 'year'
+let currentView = 'month'; 
 let currentYearView;
 
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -648,9 +613,9 @@ async function fetchWithFallback(url) {
       if (!res.ok) continue;
       const text = await res.text();
       if (text && text.includes('<item>')) return text;
-    } catch (e) { /* try next */ }
+    } catch (e) { }
   }
-  throw new Error('All proxies failed. Check your internet connection.');
+  throw new Error('All proxies failed.');
 }
 
 async function fetchDiary() {
@@ -697,9 +662,7 @@ async function fetchDiary() {
     document.getElementById('app').innerHTML = `
       <div class="error-box">
         <h3>🎬 Couldn't load diary</h3>
-        <p>All CORS proxies failed. This usually means your internet is offline, or the proxies are temporarily down. Try refreshing in a moment.</p>
         <code>Error: ${err.message}</code>
-        <p style="margin-top:14px;font-size:0.8rem;color:var(--muted)">Tip: Make sure you're online and try opening the file in Chrome or Firefox.</p>
       </div>`;
   }
 }
@@ -731,7 +694,7 @@ function render() {
   else renderYear();
 }
 
-/* ─── MONTH VIEW ─── */
+/* ─── UPDATED MONTH VIEW ─── */
 function renderMonth() {
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -754,41 +717,35 @@ function renderMonth() {
 
     let moviesHTML = '';
     if (entries.length > 0) {
-      const primary = entries[0];
-      const stars = starsFromRating(primary.rating);
-      const imgTag = primary.poster
-        ? `<img src="${primary.poster}" alt="${primary.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=poster-placeholder>🎬</div>'">`
-        : `<div class="poster-placeholder">🎬</div>`;
-      moviesHTML += `
-        <div class="movie-thumb" onclick="openModal(${JSON.stringify(primary).replace(/"/g,'&quot;')})">
-          ${imgTag}
-          <div class="movie-label">
-            ${primary.title}
-            ${stars ? `<div class="rating-stars">${stars}</div>` : ''}
-          </div>
-        </div>`;
+      // Create a grid class based on count (max 4 shown effectively)
+      const displayCount = Math.min(entries.length, 4);
+      const gridClass = `count-${displayCount}`;
 
-      // Extra films row (up to 2 more shown as mini posters)
-      if (entries.length > 1) {
-        const extras = entries.slice(1, 4);
-        const remaining = entries.length - 4;
-        moviesHTML += `<div class="extra-films">`;
-        extras.forEach((e, idx) => {
-          const isLast = idx === extras.length - 1 && remaining > 0;
-          moviesHTML += `<div class="extra-thumb" onclick="openModal(${JSON.stringify(e).replace(/"/g,'&quot;')})">`;
-          if (e.poster) moviesHTML += `<img src="${e.poster}" alt="${e.title}" loading="lazy">`;
-          else moviesHTML += `<div class="extra-placeholder">🎬</div>`;
-          if (isLast) moviesHTML += `<div class="more-badge-overlay">+${remaining+1}</div>`;
-          moviesHTML += `</div>`;
-        });
-        moviesHTML += `</div>`;
-      }
+      moviesHTML += `<div class="movie-poster-stack ${gridClass}">`;
+      
+      entries.slice(0, 4).forEach(entry => {
+        const stars = starsFromRating(entry.rating);
+        const imgTag = entry.poster
+          ? `<img src="${entry.poster}" alt="${entry.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=poster-placeholder>🎬</div>'">`
+          : `<div class="poster-placeholder">🎬</div>`;
+        
+        moviesHTML += `
+          <div class="movie-thumb" onclick="openModal(${JSON.stringify(entry).replace(/"/g,'&quot;')})">
+            ${imgTag}
+            <div class="movie-label">
+              ${entry.title}
+              ${stars ? `<div class="rating-stars">${stars}</div>` : ''}
+            </div>
+          </div>`;
+      });
+
+      moviesHTML += `</div>`;
     }
 
     cellsHTML += `
       <div class="${cls}">
         <div class="day-num">${d}</div>
-        <div class="movie-poster-stack">${moviesHTML}</div>
+        ${moviesHTML}
       </div>`;
   }
 
@@ -826,7 +783,6 @@ function renderYear() {
     const mEntries = yearEntries.filter(e => e.date.getMonth() === m);
     const mCount = mEntries.length;
 
-    // Build mini cells
     let miniCells = '';
     for (let i = 0; i < firstDay; i++) miniCells += `<div class="mini-cell empty-mini"></div>`;
 
