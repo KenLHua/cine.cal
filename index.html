@@ -170,7 +170,7 @@
   /* ── Calendar (Month View) ── */
   .calendar-wrap {
     padding: 14px 48px 20px;
-    max-width: 1400px;
+    max-width: 1100px;
     margin: 0 auto;
   }
 
@@ -207,6 +207,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    scroll-margin-top: 100px;
   }
   .cal-cell.empty {
     background: transparent;
@@ -220,15 +221,27 @@
   .cal-cell.today { border-color: var(--accent2); box-shadow: 0 0 12px rgba(255,128,64,0.18); }
 
   .day-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-bottom: 5px;
-    flex-shrink: 0;
-    z-index: 1;
-    position: relative;
-  }
-  .cal-cell.today .day-num { color: var(--accent2); font-weight: 500; }
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Create the top-down gradient shadow for readability */
+  background: linear-gradient(rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 30%, transparent 100%);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  padding: 6px 8px 15px; /* Extra bottom padding for the gradient spread */
+  z-index: 5; /* Ensure it stays above the poster image */
+  pointer-events: none; /* Allows clicks to pass through to the poster below */
+  margin-bottom: 0;
+}
+  .cal-cell.today .day-num {
+  color: var(--accent2);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255,128,64,0.5);
+  padding: 0; /* Remove top padding to let content fill the cell */
+  position: relative;
+}
 
   /* UPDATED: Stack is now a grid that adjusts based on count */
   .movie-poster-stack {
@@ -567,6 +580,9 @@
     <div style="font-size:0.78rem;color:var(--muted)">
       <span id="last-updated"></span>
     </div>
+    <div class="profile-tag" style="background: rgba(255,128,64,0.05); border-color: rgba(255,128,64,0.2);">
+  <span style="color: var(--accent2);">⏳ <span id="days-since">--</span> days since last watch</span>
+</div>
   </div>
 </header>
 
@@ -618,6 +634,20 @@ async function fetchWithFallback(url) {
   throw new Error('All proxies failed.');
 }
 
+function updateDaysSinceCounter() {
+  if (allEntries.length === 0) return;
+  
+  // allEntries[0] is the most recent because the list is sorted by date
+  const lastEntryDate = allEntries[0].date;
+  const today = new Date();
+  
+  // Calculate difference in milliseconds and convert to full days
+  const diffTime = Math.abs(today - lastEntryDate);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  document.getElementById('days-since').textContent = diffDays;
+}
+
 async function fetchDiary() {
   try {
     const xmlText = await fetchWithFallback(RSS_URL);
@@ -658,6 +688,7 @@ async function fetchDiary() {
     document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
 
     render();
+    updateDaysSinceCounter();
   } catch (err) {
     document.getElementById('app').innerHTML = `
       <div class="error-box">
@@ -766,6 +797,18 @@ function renderMonth() {
       <div class="day-headers">${dayHeadersHTML}</div>
       <div class="calendar-grid">${cellsHTML}</div>
     </div>`;
+
+    if (isCurrentMonth) {
+  setTimeout(() => {
+    const todayCell = document.querySelector('.cal-cell.today');
+    if (todayCell) {
+      todayCell.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  }, 100); // Small delay to ensure the DOM has finished rendering
+}
 }
 
 /* ─── YEAR VIEW ─── */
