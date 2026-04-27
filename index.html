@@ -769,7 +769,7 @@ function renderMonth() {
           : `<div class="poster-placeholder">🎬</div>`;
         
         moviesHTML += `
-          <div class="movie-thumb" onclick="openModal(${JSON.stringify(entry).replace(/"/g,'&quot;')})">
+          <div class="movie-thumb" onclick="window.open('${entry.link}', '_blank')">
             ${imgTag}
             <div class="movie-label">
               ${entry.title}
