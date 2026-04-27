@@ -1,775 +1,946 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Letterboxd Calendar — kenteato</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0d0d0f;
-    --surface: #161618;
-    --surface2: #1e1e22;
-    --border: #2a2a30;
-    --accent: #00c030;
-    --accent2: #ff8040;
-    --text: #e8e8ec;
-    --muted: #6b6b78;
-    --card-hover: #242428;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letterboxd Calendar — kenteato</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #161618;
+      --surface2: #1e1e22;
+      --border: #2a2a30;
+      --accent: #00c030;
+      --accent2: #ff8040;
+      --text: #e8e8ec;
+      --muted: #6b6b78;
+      --card-hover: #242428;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Instrument Sans', sans-serif;
-    min-height: 100vh;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Instrument Sans', sans-serif;
+      min-height: 100vh;
+    }
 
-  /* ── Header ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 28px 48px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(13,13,15,0.92);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-  }
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 48px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13, 13, 15, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
 
-  .logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    letter-spacing: -0.5px;
-  }
-  .logo span { color: var(--accent); }
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+    }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+    .logo span {
+      color: var(--accent);
+    }
 
-  .profile-tag {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 18px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-  .profile-tag .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-  /* ── View Toggle ── */
-  .view-toggle {
-    display: flex;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 4px;
-    gap: 2px;
-  }
-  .view-btn {
-    padding: 6px 16px;
-    border-radius: 999px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-  .view-btn.active {
-    background: var(--accent);
-    color: #000;
-    font-weight: 500;
-  }
-  .view-btn:not(.active):hover { color: var(--text); }
+    .profile-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
 
-  /* ── Month Nav ── */
-  .month-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    padding: 16px 48px 0;
-  }
+    .profile-tag .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
 
-  .month-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.9rem;
-    font-style: italic;
-    letter-spacing: -1px;
-    min-width: 260px;
-    text-align: center;
-  }
+    @keyframes pulse {
 
-  .nav-btn {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-  }
-  .nav-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(0,192,48,0.08);
-  }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-  /* ── Stats bar ── */
-  .stats-bar {
-    display: flex;
-    gap: 32px;
-    padding: 10px 48px 0;
-    justify-content: center;
-  }
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .stat-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: var(--accent);
-  }
-  .stat-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
+      50% {
+        opacity: 0.4;
+      }
+    }
 
-  /* ── Calendar (Month View) ── */
-  .calendar-wrap {
-    padding: 14px 48px 20px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
+    /* ── View Toggle ── */
+    .view-toggle {
+      display: flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 2px;
+    }
 
-  .day-headers {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-bottom: 6px;
-  }
-  .day-header {
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    padding: 8px 0;
-  }
+    .view-btn {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
 
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-  }
+    .view-btn.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 500;
+    }
 
-  .cal-cell {
-    aspect-ratio: 3 / 4;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 6px 5px 5px;
-    position: relative;
-    transition: border-color 0.2s, transform 0.15s;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    scroll-margin-top: 100px;
-  }
-  .cal-cell.empty {
-    background: transparent;
-    border-color: transparent;
-  }
-  .cal-cell.has-movies { border-color: #2a2a36; }
-  .cal-cell.has-movies:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-  .cal-cell.today { border-color: var(--accent2); box-shadow: 0 0 12px rgba(255,128,64,0.18); }
+    .view-btn:not(.active):hover {
+      color: var(--text);
+    }
 
-  .has-movies .day-num {
-  color: var(--text);
-  /* Use a soft radial or solid background centered on the text */
-  background: rgba(0, 0, 0, 0.4); 
-  backdrop-filter: blur(4px); /* Optional: makes the text pop even more */
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    /* ── Month Nav ── */
+    .month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Keeps the title centered in the viewport */
+  gap: 24px;
+  padding: 16px 48px 0;
+  position: relative; /* Allows the stats bar to anchor to the right */
 }
+    .month-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.9rem;
+      font-style: italic;
+      letter-spacing: -1px;
+      min-width: 260px;
+      text-align: center;
+    }
 
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
 
+    .nav-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 192, 48, 0.08);
+    }
 
-  .day-num {
+    /* ── Stats bar ── */
+    .stats-bar {
+  display: flex;
+  gap: 24px;
+  padding: 0;
   position: absolute;
-  top: 8px; /* Offset from the top */
-  left: 10px; /* Offset from the left */
-  color: var(--muted);
+  right: 48px; /* Matches the header/nav padding */
+  top: 50%;
+  transform: translateY(-50%); /* Centers it vertically relative to the nav buttons */
+}
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-num {
   font-family: 'DM Mono', monospace;
-  font-size: 0.72rem;
-  padding: 2px 6px; /* Tight padding around the text */
-  border-radius: 4px; /* Slight rounding for the background */
-  z-index: 5;
-  pointer-events: none;
-  width: max-content; /* Ensure the background only wraps the text */
-}
-  .cal-cell.today .day-num {
-  color: var(--accent2);
-  font-weight: 600;
-  text-shadow: 0 0 10px rgba(255,128,64,0.5);
-  padding: 0; /* Remove top padding to let content fill the cell */
-  position: relative;
-}
-
-  /* UPDATED: Stack is now a grid that adjusts based on count */
-  .movie-poster-stack {
-    display: grid;
-    gap: 4px;
-    flex: 1;
-    min-height: 0;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-  }
-
-  /* Change grid layout based on movie count */
-  .movie-poster-stack.count-2 { grid-template-rows: 1fr 1fr; }
-  .movie-poster-stack.count-3 { grid-template-rows: 1fr 1fr 1fr; }
-  .movie-poster-stack.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-
-  .movie-thumb {
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s;
-    width: 100%;
-    height: 100%;
-  }
-  .movie-thumb:hover { transform: scale(1.03); z-index: 10; }
-  .movie-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    background: var(--surface2);
-  }
-  .movie-thumb .movie-label {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.92));
-    padding: 18px 5px 5px;
-    font-size: 0.52rem;
-    line-height: 1.2;
-    color: #fff;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .movie-thumb:hover .movie-label { opacity: 1; }
-  .movie-thumb .poster-placeholder {
-    width: 100%; height: 100%;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-  }
-
-  .rating-stars {
-    font-size: 0.45rem; /* Base size when not hovered (if visible) */
+  font-size: 1.1rem; /* Reduced from 1.5rem */
+  font-weight: 500;
   color: var(--accent);
-  margin-top: 2px;
-  letter-spacing: -1px;
-  transition: font-size 0.2s ease; /* Smooth transition for the size change */
-}
-.movie-thumb:hover .rating-stars {
-  font-size: 0.9rem; /* Increased size on hover */
-  letter-spacing: 0px; /* Adjust spacing so larger stars don't overlap too much */
-  margin-top: 4px;
+  line-height: 1;
 }
 
-  /* ── Year View ── */
-  .year-view-wrap {
-    padding: 32px 48px 64px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  .year-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    padding: 36px 48px 24px;
-  }
-  .year-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2.8rem;
-    font-style: italic;
-    letter-spacing: -1px;
-    min-width: 140px;
-    text-align: center;
-  }
+    .stat-label {
+  font-size: 0.6rem; /* Reduced from 0.72rem */
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
-  .year-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
+    /* ── Calendar (Month View) ── */
+    .calendar-wrap {
+      padding: 14px 48px 20px;
+      max-width: 950px;
+      margin: 0 auto;
+    }
 
-  .mini-month {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s;
-  }
-  .mini-month:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-  .mini-month-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 0.95rem;
-    font-style: italic;
-    margin-bottom: 8px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .mini-month-count {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--accent);
-    font-style: normal;
-  }
+    .day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
 
-  .mini-day-headers {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    margin-bottom: 2px;
-  }
-  .mini-day-header {
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.52rem;
-    color: var(--muted);
-    padding: 2px 0;
-  }
+    .day-header {
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 8px 0;
+    }
 
-  .mini-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-  }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
 
-  .mini-cell {
-    aspect-ratio: 2 / 3;
-    border-radius: 3px;
-    position: relative;
-    overflow: hidden;
-    background: var(--surface2);
-    border: 1px solid transparent;
-    cursor: default;
-    transition: border-color 0.15s;
-  }
-  .mini-cell.empty-mini { background: transparent; }
-  .mini-cell.has-film {
-    border-color: rgba(0,192,48,0.25);
-    cursor: pointer;
-  }
-  .mini-cell.has-film:hover { border-color: var(--accent); }
-  .mini-cell.today-mini { border-color: var(--accent2) !important; }
-  .mini-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .mini-cell .mini-day-num {
-    position: absolute;
-    bottom: 1px; left: 0; right: 0;
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.42rem;
-    color: rgba(255,255,255,0.6);
-    line-height: 1;
-  }
-  .mini-cell.has-film .mini-day-num { color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-  .mini-multi-dot {
-    position: absolute;
-    top: 2px; right: 2px;
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: 0.9;
-    font-size: 0.35rem;
-    display: flex; align-items: center; justify-content: center;
-    color: #000;
-    font-weight: 700;
-  }
+    .cal-cell {
+      aspect-ratio: 3 / 4;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 5px 5px;
+      position: relative;
+      transition: border-color 0.2s, transform 0.15s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scroll-margin-top: 100px;
+    }
 
-  /* ── Year Stats ── */
-  .year-stats-bar {
-    display: flex;
-    gap: 48px;
-    padding: 0 48px 28px;
-    justify-content: center;
-  }
+    .cal-cell.empty {
+      background: transparent;
+      border-color: transparent;
+    }
 
-  /* ── Loading / Error ── */
-  .loading-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    gap: 20px;
-  }
-  .film-roll {
-    font-size: 3rem;
-    animation: spin 3s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
+    .cal-cell.has-movies {
+      border-color: #2a2a36;
+    }
 
-  .error-box {
-    background: var(--surface);
-    border: 1px solid #ff4040;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 480px;
-    margin: 60px auto;
-    text-align: center;
-  }
-  .error-box h3 { margin-bottom: 12px; color: #ff6060; }
-  .error-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
-  .error-box code {
-    display: block;
-    margin-top: 16px;
-    background: var(--surface2);
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--accent2);
-    text-align: left;
-  }
+    .cal-cell.has-movies:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
 
-  /* ── Modal ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(6px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
-    max-width: 360px;
-    width: 90%;
-    position: relative;
-    animation: slideUp 0.25s ease;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .modal img {
-    width: 100%;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    max-height: 240px;
-    object-fit: cover;
-  }
-  .modal h3 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.3rem;
-    margin-bottom: 4px;
-  }
-  .modal .modal-meta {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-  .modal .modal-rating { font-size: 1rem; color: var(--accent); }
-  .modal .close-btn {
-    position: absolute;
-    top: 14px; right: 14px;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal .lbd-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 14px;
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-family: 'DM Mono', monospace;
-    border: 1px solid rgba(0,192,48,0.3);
-    padding: 6px 14px;
-    border-radius: 999px;
-    transition: background 0.2s;
-  }
-  .modal .lbd-link:hover { background: rgba(0,192,48,0.1); }
+    .cal-cell.today {
+      border-color: var(--accent2);
+      box-shadow: 0 0 12px rgba(255, 128, 64, 0.18);
+    }
 
-  /* ── Responsive ── */
-  @media (max-width: 900px) {
-    header { padding: 20px 20px; }
-    .calendar-wrap, .year-view-wrap { padding: 16px 12px 48px; }
-    .month-nav, .year-title-row { padding: 24px 12px 16px; }
-    .stats-bar, .year-stats-bar { padding: 16px 12px 0; gap: 20px; }
-    .year-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>
+    .has-movies .day-num {
+      color: var(--text);
+      /* Use a soft radial or solid background centered on the text */
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      /* Optional: makes the text pop even more */
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+
+
+    .day-num {
+      position: absolute;
+      top: 8px;
+      /* Offset from the top */
+      left: 10px;
+      /* Offset from the left */
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      /* Tight padding around the text */
+      border-radius: 4px;
+      /* Slight rounding for the background */
+      z-index: 5;
+      pointer-events: none;
+      width: max-content;
+      /* Ensure the background only wraps the text */
+    }
+
+    .cal-cell.today .day-num {
+      color: var(--accent2);
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(255, 128, 64, 0.5);
+      padding: 0;
+      /* Remove top padding to let content fill the cell */
+      position: relative;
+    }
+
+    /* UPDATED: Stack is now a grid that adjusts based on count */
+    .movie-poster-stack {
+      display: grid;
+      gap: 4px;
+      flex: 1;
+      min-height: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+    }
+
+    /* Change grid layout based on movie count */
+    .movie-poster-stack.count-2 {
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .movie-poster-stack.count-3 {
+      grid-template-rows: 1fr 1fr 1fr;
+    }
+
+    .movie-poster-stack.count-4 {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .movie-thumb {
+      position: relative;
+      border-radius: 5px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+      width: 100%;
+      height: 100%;
+    }
+
+    .movie-thumb:hover {
+      transform: scale(1.03);
+      z-index: 10;
+    }
+
+    .movie-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: var(--surface2);
+    }
+
+    .movie-thumb .movie-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.92));
+      padding: 18px 5px 5px;
+      font-size: 0.8rem;
+      line-height: 1.2;
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .movie-thumb:hover .movie-label {
+      opacity: 1;
+    }
+
+    .movie-thumb .poster-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .rating-stars {
+      font-size: 0.45rem;
+      /* Base size when not hovered (if visible) */
+      color: var(--accent);
+      margin-top: 2px;
+      letter-spacing: -1px;
+      transition: font-size 0.2s ease;
+      /* Smooth transition for the size change */
+    }
+
+    .movie-thumb:hover .rating-stars {
+      font-size: 0.9rem;
+      /* Increased size on hover */
+      letter-spacing: 0px;
+      /* Adjust spacing so larger stars don't overlap too much */
+      margin-top: 4px;
+    }
+
+    /* ── Year View ── */
+    .year-view-wrap {
+      padding: 32px 48px 64px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .year-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 36px 48px 24px;
+    }
+
+    .year-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.8rem;
+      font-style: italic;
+      letter-spacing: -1px;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .year-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .mini-month {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .mini-month:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .mini-month-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      margin-bottom: 8px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-month-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .mini-day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      margin-bottom: 2px;
+    }
+
+    .mini-day-header {
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      color: var(--muted);
+      padding: 2px 0;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .mini-cell {
+      aspect-ratio: 2 / 3;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      background: var(--surface2);
+      border: 1px solid transparent;
+      cursor: default;
+      transition: border-color 0.15s;
+    }
+
+    .mini-cell.empty-mini {
+      background: transparent;
+    }
+
+    .mini-cell.has-film {
+      border-color: rgba(0, 192, 48, 0.25);
+      cursor: pointer;
+    }
+
+    .mini-cell.has-film:hover {
+      border-color: var(--accent);
+    }
+
+    .mini-cell.today-mini {
+      border-color: var(--accent2) !important;
+    }
+
+    .mini-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .mini-cell .mini-day-num {
+      position: absolute;
+      bottom: 1px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.42rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1;
+    }
+
+    .mini-cell.has-film .mini-day-num {
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .mini-multi-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.9;
+      font-size: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* ── Year Stats ── */
+    .year-stats-bar {
+      display: flex;
+      gap: 48px;
+      padding: 0 48px 28px;
+      justify-content: center;
+    }
+
+    /* ── Loading / Error ── */
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      gap: 20px;
+    }
+
+    .film-roll {
+      font-size: 3rem;
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .error-box {
+      background: var(--surface);
+      border: 1px solid #ff4040;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      margin: 60px auto;
+      text-align: center;
+    }
+
+    .error-box h3 {
+      margin-bottom: 12px;
+      color: #ff6060;
+    }
+
+    .error-box p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .error-box code {
+      display: block;
+      margin-top: 16px;
+      background: var(--surface2);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent2);
+      text-align: left;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 360px;
+      width: 90%;
+      position: relative;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      max-height: 240px;
+      object-fit: cover;
+    }
+
+    .modal h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+    }
+
+    .modal .modal-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .modal .modal-rating {
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    .modal .close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal .lbd-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-family: 'DM Mono', monospace;
+      border: 1px solid rgba(0, 192, 48, 0.3);
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: background 0.2s;
+    }
+
+    .modal .lbd-link:hover {
+      background: rgba(0, 192, 48, 0.1);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      header {
+        padding: 20px 20px;
+      }
+
+      .calendar-wrap,
+      .year-view-wrap {
+        padding: 16px 12px 48px;
+      }
+
+      .month-nav,
+      .year-title-row {
+        padding: 24px 12px 16px;
+      }
+
+      .stats-bar,
+      .year-stats-bar {
+        padding: 16px 12px 0;
+        gap: 20px;
+      }
+
+      .year-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">cine<span>.</span>cal</div>
-  <div class="header-right">
-    <div class="view-toggle">
-      <button class="view-btn active" id="btn-month" onclick="setView('month')">Month</button>
-      <button class="view-btn" id="btn-year" onclick="setView('year')">Year</button>
+  <header>
+    <div class="logo">cine<span>.</span>cal</div>
+    <div class="header-right">
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-month" onclick="setView('month')">Month</button>
+        <button class="view-btn" id="btn-year" onclick="setView('year')">Year</button>
+      </div>
+      <div class="profile-tag">
+        <div class="dot"></div>
+        <span id="profile-label">letterboxd.com/kenteato</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted)">
+        <span id="last-updated"></span>
+      </div>
     </div>
-    <div class="profile-tag">
-      <div class="dot"></div>
-      <span id="profile-label">letterboxd.com/kenteato</span>
+  </header>
+
+  <div id="app">
+    <div class="loading-screen">
+      <div class="film-roll">🎞️</div>
+      <div class="loading-text">Loading diary entries…</div>
     </div>
-    <div style="font-size:0.78rem;color:var(--muted)">
-      <span id="last-updated"></span>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal()">✕</button>
+      <img id="modal-img" src="" alt="">
+      <h3 id="modal-title"></h3>
+      <div class="modal-meta" id="modal-meta"></div>
+      <div class="modal-rating" id="modal-rating"></div>
+      <a id="modal-link" class="lbd-link" href="#" target="_blank">View on Letterboxd ↗</a>
     </div>
-    <div class="profile-tag" style="background: rgba(255,128,64,0.05); border-color: rgba(255,128,64,0.2);">
-  <span style="color: var(--accent2);">⏳ <span id="days-since">--</span> days since last watch</span>
-</div>
   </div>
-</header>
 
-<div id="app">
-  <div class="loading-screen">
-    <div class="film-roll">🎞️</div>
-    <div class="loading-text">Loading diary entries…</div>
-  </div>
-</div>
+  <script>
+    const USERNAME = 'kenteato';
+    const RSS_URL = `https://letterboxd.com/${USERNAME}/rss/`;
 
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal()">✕</button>
-    <img id="modal-img" src="" alt="">
-    <h3 id="modal-title"></h3>
-    <div class="modal-meta" id="modal-meta"></div>
-    <div class="modal-rating" id="modal-rating"></div>
-    <a id="modal-link" class="lbd-link" href="#" target="_blank">View on Letterboxd ↗</a>
-  </div>
-</div>
+    const PROXIES = [
+      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+      url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    ];
 
-<script>
-const USERNAME = 'kenteato';
-const RSS_URL = `https://letterboxd.com/${USERNAME}/rss/`;
+    let allEntries = [];
+    let currentYear, currentMonth;
+    let currentView = 'month';
+    let currentYearView;
 
-const PROXIES = [
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-];
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-let allEntries = [];
-let currentYear, currentMonth;
-let currentView = 'month'; 
-let currentYearView;
+    async function fetchWithFallback(url) {
+      for (const proxyFn of PROXIES) {
+        try {
+          const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(8000) });
+          if (!res.ok) continue;
+          const text = await res.text();
+          if (text && text.includes('<item>')) return text;
+        } catch (e) { }
+      }
+      throw new Error('All proxies failed.');
+    }
 
-const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    function updateDaysSinceCounter() {
+      if (allEntries.length === 0) return;
 
-async function fetchWithFallback(url) {
-  for (const proxyFn of PROXIES) {
-    try {
-      const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(8000) });
-      if (!res.ok) continue;
-      const text = await res.text();
-      if (text && text.includes('<item>')) return text;
-    } catch (e) { }
-  }
-  throw new Error('All proxies failed.');
-}
+      // allEntries[0] is the most recent because the list is sorted by date
+      const lastEntryDate = allEntries[0].date;
+      const today = new Date();
 
-function updateDaysSinceCounter() {
-  if (allEntries.length === 0) return;
-  
-  // allEntries[0] is the most recent because the list is sorted by date
-  const lastEntryDate = allEntries[0].date;
-  const today = new Date();
-  
-  // Calculate difference in milliseconds and convert to full days
-  const diffTime = Math.abs(today - lastEntryDate);
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
-  document.getElementById('days-since').textContent = diffDays;
-}
+      // Calculate difference in milliseconds and convert to full days
+      const diffTime = Math.abs(today - lastEntryDate);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-async function fetchDiary() {
-  try {
-    const xmlText = await fetchWithFallback(RSS_URL);
-    const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
-    const items = [...xml.querySelectorAll('item')];
+      document.getElementById('days-since').textContent = diffDays;
+    }
 
-    allEntries = items.map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const desc = item.querySelector('description')?.textContent || '';
-      const watchedDate = item.getElementsByTagNameNS('https://letterboxd.com', 'watchedDate')[0]?.textContent
-                       || item.querySelector('watchedDate')?.textContent
-                       || pubDate;
-      const rating = item.getElementsByTagNameNS('https://letterboxd.com', 'memberRating')[0]?.textContent || '';
-      const filmTitle = item.getElementsByTagNameNS('https://letterboxd.com', 'filmTitle')[0]?.textContent
-                      || title.replace(/^[^:]+:\s*/, '').replace(/,\s*\d{4}$/, '').trim();
-      const filmYear = item.getElementsByTagNameNS('https://letterboxd.com', 'filmYear')[0]?.textContent || '';
+    async function fetchDiary() {
+      try {
+        const xmlText = await fetchWithFallback(RSS_URL);
+        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+        const items = [...xml.querySelectorAll('item')];
 
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = desc;
-      const imgEl = tempDiv.querySelector('img');
-      const poster = imgEl?.src || imgEl?.getAttribute('src') || '';
+        allEntries = items.map(item => {
+          const title = item.querySelector('title')?.textContent || '';
+          const link = item.querySelector('link')?.textContent || '';
+          const pubDate = item.querySelector('pubDate')?.textContent || '';
+          const desc = item.querySelector('description')?.textContent || '';
+          const watchedDate = item.getElementsByTagNameNS('https://letterboxd.com', 'watchedDate')[0]?.textContent
+            || item.querySelector('watchedDate')?.textContent
+            || pubDate;
+          const rating = item.getElementsByTagNameNS('https://letterboxd.com', 'memberRating')[0]?.textContent || '';
+          const filmTitle = item.getElementsByTagNameNS('https://letterboxd.com', 'filmTitle')[0]?.textContent
+            || title.replace(/^[^:]+:\s*/, '').replace(/,\s*\d{4}$/, '').trim();
+          const filmYear = item.getElementsByTagNameNS('https://letterboxd.com', 'filmYear')[0]?.textContent || '';
 
-      const date = new Date(watchedDate);
-      return { title: filmTitle, year: filmYear, date, rating: parseFloat(rating) || 0, poster, link };
-    }).filter(e => !isNaN(e.date.getTime()));
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = desc;
+          const imgEl = tempDiv.querySelector('img');
+          const poster = imgEl?.src || imgEl?.getAttribute('src') || '';
 
-    if (allEntries.length === 0) throw new Error('No diary entries found.');
+          const date = new Date(watchedDate);
+          return { title: filmTitle, year: filmYear, date, rating: parseFloat(rating) || 0, poster, link };
+        }).filter(e => !isNaN(e.date.getTime()));
 
-    allEntries.sort((a,b) => b.date - a.date);
+        if (allEntries.length === 0) throw new Error('No diary entries found.');
 
-    const newest = allEntries[0].date;
-    currentYear = newest.getFullYear();
-    currentMonth = newest.getMonth();
-    currentYearView = currentYear;
+        allEntries.sort((a, b) => b.date - a.date);
 
-    document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+        const newest = allEntries[0].date;
+        currentYear = newest.getFullYear();
+        currentMonth = newest.getMonth();
+        currentYearView = currentYear;
 
-    render();
-    updateDaysSinceCounter();
-  } catch (err) {
-    document.getElementById('app').innerHTML = `
+        document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+        render();
+        updateDaysSinceCounter();
+      } catch (err) {
+        document.getElementById('app').innerHTML = `
       <div class="error-box">
         <h3>🎬 Couldn't load diary</h3>
         <code>Error: ${err.message}</code>
       </div>`;
-  }
-}
+      }
+    }
 
-function starsFromRating(r) {
-  if (!r) return '';
-  const full = Math.floor(r);
-  const half = (r % 1) >= 0.5 ? 1 : 0;
-  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - half);
-}
+    function starsFromRating(r) {
+      if (!r) return '';
+      const full = Math.floor(r);
+      const half = (r % 1) >= 0.5 ? 1 : 0;
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - half);
+    }
 
-function getEntriesForDay(year, month, day) {
-  return allEntries.filter(e =>
-    e.date.getFullYear() === year &&
-    e.date.getMonth() === month &&
-    e.date.getDate() === day
-  );
-}
+    function getEntriesForDay(year, month, day) {
+      return allEntries.filter(e =>
+        e.date.getFullYear() === year &&
+        e.date.getMonth() === month &&
+        e.date.getDate() === day
+      );
+    }
 
-function setView(v) {
-  currentView = v;
-  document.getElementById('btn-month').classList.toggle('active', v === 'month');
-  document.getElementById('btn-year').classList.toggle('active', v === 'year');
-  render();
-}
+    function setView(v) {
+      currentView = v;
+      document.getElementById('btn-month').classList.toggle('active', v === 'month');
+      document.getElementById('btn-year').classList.toggle('active', v === 'year');
+      render();
+    }
 
-function render() {
-  if (currentView === 'month') renderMonth();
-  else renderYear();
-}
+    function render() {
+      if (currentView === 'month') renderMonth();
+      else renderYear();
+    }
 
-/* ─── UPDATED MONTH VIEW ─── */
-function renderMonth() {
-  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    /* ─── UPDATED MONTH VIEW ─── */
+    function renderMonth() {
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  const monthEntries = allEntries.filter(e => e.date.getFullYear() === currentYear && e.date.getMonth() === currentMonth);
-  const totalFilms = monthEntries.length;
-  const avgRating = monthEntries.filter(e=>e.rating).reduce((s,e)=>s+e.rating,0) / (monthEntries.filter(e=>e.rating).length||1);
-  const activeDays = new Set(monthEntries.map(e=>e.date.getDate())).size;
+      const monthEntries = allEntries.filter(e => e.date.getFullYear() === currentYear && e.date.getMonth() === currentMonth);
+      const totalFilms = monthEntries.length;
+      const avgRating = monthEntries.filter(e => e.rating).reduce((s, e) => s + e.rating, 0) / (monthEntries.filter(e => e.rating).length || 1);
+      const activeDays = new Set(monthEntries.map(e => e.date.getDate())).size;
 
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear()===currentYear && today.getMonth()===currentMonth;
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
 
-  let cellsHTML = '';
-  for (let i=0; i<firstDay; i++) cellsHTML += `<div class="cal-cell empty"></div>`;
+      let cellsHTML = '';
+      for (let i = 0; i < firstDay; i++) cellsHTML += `<div class="cal-cell empty"></div>`;
 
-  for (let d=1; d<=daysInMonth; d++) {
-    const entries = getEntriesForDay(currentYear, currentMonth, d);
-    const isToday = isCurrentMonth && today.getDate()===d;
-    const cls = ['cal-cell', entries.length?'has-movies':'', isToday?'today':''].join(' ').trim();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const entries = getEntriesForDay(currentYear, currentMonth, d);
+        const isToday = isCurrentMonth && today.getDate() === d;
+        const cls = ['cal-cell', entries.length ? 'has-movies' : '', isToday ? 'today' : ''].join(' ').trim();
 
-    let moviesHTML = '';
-    if (entries.length > 0) {
-      // Create a grid class based on count (max 4 shown effectively)
-      const displayCount = Math.min(entries.length, 4);
-      const gridClass = `count-${displayCount}`;
+        let moviesHTML = '';
+        if (entries.length > 0) {
+          // Create a grid class based on count (max 4 shown effectively)
+          const displayCount = Math.min(entries.length, 4);
+          const gridClass = `count-${displayCount}`;
 
-      moviesHTML += `<div class="movie-poster-stack ${gridClass}">`;
-      
-      entries.slice(0, 4).forEach(entry => {
-        const stars = starsFromRating(entry.rating);
-        const imgTag = entry.poster
-          ? `<img src="${entry.poster}" alt="${entry.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=poster-placeholder>🎬</div>'">`
-          : `<div class="poster-placeholder">🎬</div>`;
+          moviesHTML += `<div class="movie-poster-stack ${gridClass}">`;
 
-        
-        moviesHTML += `
+          entries.slice(0, 4).forEach(entry => {
+            const stars = starsFromRating(entry.rating);
+            const imgTag = entry.poster
+              ? `<img src="${entry.poster}" alt="${entry.title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=poster-placeholder>🎬</div>'">`
+              : `<div class="poster-placeholder">🎬</div>`;
+
+
+            moviesHTML += `
           <div class="movie-thumb" onclick="window.open('${entry.link}', '_blank')">
             ${imgTag}
             <div class="review-icon">💬</div>
@@ -778,96 +949,101 @@ function renderMonth() {
               ${stars ? `<div class="rating-stars">${stars}</div>` : ''}
             </div>
           </div>`;
-      });
+          });
 
-      moviesHTML += `</div>`;
-    }
+          moviesHTML += `</div>`;
+        }
 
-    cellsHTML += `
+        cellsHTML += `
       <div class="${cls}">
         <div class="day-num">${d}</div>
         ${moviesHTML}
       </div>`;
-  }
-
-  const dayHeadersHTML = dayNames.map(d=>`<div class="day-header">${d}</div>`).join('');
-
-  document.getElementById('app').innerHTML = `
-    <div class="month-nav">
-      <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
-      <div class="month-title">${monthNames[currentMonth]} ${currentYear}</div>
-      <button class="nav-btn" onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="stats-bar">
-      <div class="stat"><div class="stat-num">${totalFilms}</div><div class="stat-label">Films</div></div>
-      <div class="stat"><div class="stat-num">${totalFilms>0&&avgRating?avgRating.toFixed(1):'—'}</div><div class="stat-label">Avg Rating</div></div>
-    </div>
-    <div class="calendar-wrap">
-      <div class="day-headers">${dayHeadersHTML}</div>
-      <div class="calendar-grid">${cellsHTML}</div>
-    </div>`;
-
-    if (isCurrentMonth) {
-  setTimeout(() => {
-    const todayCell = document.querySelector('.cal-cell.today');
-    if (todayCell) {
-      todayCell.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-      });
-    }
-  }, 100); // Small delay to ensure the DOM has finished rendering
-}
-}
-
-/* ─── YEAR VIEW ─── */
-function renderYear() {
-  const today = new Date();
-  const yearEntries = allEntries.filter(e => e.date.getFullYear() === currentYearView);
-  const totalFilms = yearEntries.length;
-  const activeDays = new Set(yearEntries.map(e=>`${e.date.getMonth()}-${e.date.getDate()}`)).size;
-  const avgRating = yearEntries.filter(e=>e.rating).reduce((s,e)=>s+e.rating,0) / (yearEntries.filter(e=>e.rating).length||1);
-
-  let monthsHTML = '';
-  for (let m = 0; m < 12; m++) {
-    const firstDay = new Date(currentYearView, m, 1).getDay();
-    const daysInMonth = new Date(currentYearView, m + 1, 0).getDate();
-    const mEntries = yearEntries.filter(e => e.date.getMonth() === m);
-    const mCount = mEntries.length;
-
-    let miniCells = '';
-    for (let i = 0; i < firstDay; i++) miniCells += `<div class="mini-cell empty-mini"></div>`;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dayEntries = getEntriesForDay(currentYearView, m, d);
-      const isToday = today.getFullYear()===currentYearView && today.getMonth()===m && today.getDate()===d;
-      const hasPoster = dayEntries.length > 0 && dayEntries[0].poster;
-      const cls = ['mini-cell', dayEntries.length?'has-film':'', isToday?'today-mini':''].join(' ').trim();
-      const onclick = dayEntries.length ? `onclick="jumpToDay(${m},${d})"` : '';
-
-      miniCells += `<div class="${cls}" ${onclick} title="${dayEntries.length ? dayEntries.map(e=>e.title).join(', ') : ''}">`;
-      if (hasPoster) {
-        miniCells += `<img src="${dayEntries[0].poster}" alt="" loading="lazy">`;
       }
-      miniCells += `<div class="mini-day-num">${d}</div>`;
-      if (dayEntries.length > 1) miniCells += `<div class="mini-multi-dot">${dayEntries.length}</div>`;
-      miniCells += `</div>`;
+
+      const dayHeadersHTML = dayNames.map(d => `<div class="day-header">${d}</div>`).join('');
+
+      document.getElementById('app').innerHTML = `
+<div class="month-nav">
+  <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+  <div class="month-title">${monthNames[currentMonth]} ${currentYear}</div>
+  <button class="nav-btn" onclick="changeMonth(1)">›</button>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num">${totalFilms}</div><div class="stat-label">Films</div></div>
+    <div class="stat"><div class="stat-num">${totalFilms > 0 && avgRating ? avgRating.toFixed(1) : '—'}</div><div class="stat-label">Avg</div></div>
+    <div class="profile-tag" style="background: rgba(255,128,64,0.05); border-color: rgba(255,128,64,0.2); padding: 4px 12px;">
+      <span style="color: var(--accent2); font-size: 0.7rem;">⏳ <span id="days-since">--</span>d</span>
+    </div>
+  </div>
+</div>
+
+<div class="calendar-wrap">
+  <div class="day-headers">${dayHeadersHTML}</div>
+  <div class="calendar-grid">${cellsHTML}</div>
+</div>`;
+
+      if (isCurrentMonth) {
+        setTimeout(() => {
+          const todayCell = document.querySelector('.cal-cell.today');
+          if (todayCell) {
+            todayCell.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
+        }, 100); // Small delay to ensure the DOM has finished rendering
+      }
     }
 
-    const miniDayHeaders = ['S','M','T','W','T','F','S'].map(d=>`<div class="mini-day-header">${d}</div>`).join('');
+    /* ─── YEAR VIEW ─── */
+    function renderYear() {
+      const today = new Date();
+      const yearEntries = allEntries.filter(e => e.date.getFullYear() === currentYearView);
+      const totalFilms = yearEntries.length;
+      const activeDays = new Set(yearEntries.map(e => `${e.date.getMonth()}-${e.date.getDate()}`)).size;
+      const avgRating = yearEntries.filter(e => e.rating).reduce((s, e) => s + e.rating, 0) / (yearEntries.filter(e => e.rating).length || 1);
 
-    monthsHTML += `
+      let monthsHTML = '';
+      for (let m = 0; m < 12; m++) {
+        const firstDay = new Date(currentYearView, m, 1).getDay();
+        const daysInMonth = new Date(currentYearView, m + 1, 0).getDate();
+        const mEntries = yearEntries.filter(e => e.date.getMonth() === m);
+        const mCount = mEntries.length;
+
+        let miniCells = '';
+        for (let i = 0; i < firstDay; i++) miniCells += `<div class="mini-cell empty-mini"></div>`;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dayEntries = getEntriesForDay(currentYearView, m, d);
+          const isToday = today.getFullYear() === currentYearView && today.getMonth() === m && today.getDate() === d;
+          const hasPoster = dayEntries.length > 0 && dayEntries[0].poster;
+          const cls = ['mini-cell', dayEntries.length ? 'has-film' : '', isToday ? 'today-mini' : ''].join(' ').trim();
+          const onclick = dayEntries.length ? `onclick="jumpToDay(${m},${d})"` : '';
+
+          miniCells += `<div class="${cls}" ${onclick} title="${dayEntries.length ? dayEntries.map(e => e.title).join(', ') : ''}">`;
+          if (hasPoster) {
+            miniCells += `<img src="${dayEntries[0].poster}" alt="" loading="lazy">`;
+          }
+          miniCells += `<div class="mini-day-num">${d}</div>`;
+          if (dayEntries.length > 1) miniCells += `<div class="mini-multi-dot">${dayEntries.length}</div>`;
+          miniCells += `</div>`;
+        }
+
+        const miniDayHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="mini-day-header">${d}</div>`).join('');
+
+        monthsHTML += `
       <div class="mini-month" onclick="jumpToMonth(${m})">
         <div class="mini-month-title">
           ${monthNames[m]}
-          ${mCount ? `<span class="mini-month-count">${mCount} film${mCount!==1?'s':''}</span>` : ''}
+          ${mCount ? `<span class="mini-month-count">${mCount} film${mCount !== 1 ? 's' : ''}</span>` : ''}
         </div>
         <div class="mini-day-headers">${miniDayHeaders}</div>
         <div class="mini-grid">${miniCells}</div>
       </div>`;
-  }
+      }
 
-  document.getElementById('app').innerHTML = `
+      document.getElementById('app').innerHTML = `
     <div class="year-title-row">
       <button class="nav-btn" onclick="changeYear(-1)">‹</button>
       <div class="year-title">${currentYearView}</div>
@@ -876,64 +1052,65 @@ function renderYear() {
     <div class="year-stats-bar">
       <div class="stat"><div class="stat-num">${totalFilms}</div><div class="stat-label">Films</div></div>
       <div class="stat"><div class="stat-num">${activeDays}</div><div class="stat-label">Days Watched</div></div>
-      <div class="stat"><div class="stat-num">${totalFilms>0&&avgRating?avgRating.toFixed(1):'—'}</div><div class="stat-label">Avg Rating</div></div>
+      <div class="stat"><div class="stat-num">${totalFilms > 0 && avgRating ? avgRating.toFixed(1) : '—'}</div><div class="stat-label">Avg Rating</div></div>
     </div>
     <div class="year-view-wrap">
       <div class="year-grid">${monthsHTML}</div>
     </div>`;
-}
+    }
 
-function changeMonth(dir) {
-  currentMonth += dir;
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-  render();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    function changeMonth(dir) {
+      currentMonth += dir;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-function changeYear(dir) {
-  currentYearView += dir;
-  render();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    function changeYear(dir) {
+      currentYearView += dir;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-function jumpToMonth(m) {
-  currentYear = currentYearView;
-  currentMonth = m;
-  setView('month');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    function jumpToMonth(m) {
+      currentYear = currentYearView;
+      currentMonth = m;
+      setView('month');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-function jumpToDay(m, d) {
-  currentYear = currentYearView;
-  currentMonth = m;
-  setView('month');
-  setTimeout(() => {
-    const entries = getEntriesForDay(currentYear, currentMonth, d);
-    if (entries.length === 1) openModal(entries[0]);
-  }, 80);
-}
+    function jumpToDay(m, d) {
+      currentYear = currentYearView;
+      currentMonth = m;
+      setView('month');
+      setTimeout(() => {
+        const entries = getEntriesForDay(currentYear, currentMonth, d);
+        if (entries.length === 1) openModal(entries[0]);
+      }, 80);
+    }
 
-function openModal(entry) {
-  if (typeof entry === 'string') entry = JSON.parse(entry);
-  document.getElementById('modal-img').src = entry.poster || '';
-  document.getElementById('modal-img').style.display = entry.poster ? 'block' : 'none';
-  document.getElementById('modal-title').textContent = entry.title;
-  document.getElementById('modal-meta').textContent = [entry.year, entry.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})].filter(Boolean).join(' · ');
-  document.getElementById('modal-rating').textContent = entry.rating ? starsFromRating(entry.rating) + ` (${entry.rating})` : 'No rating';
-  document.getElementById('modal-link').href = entry.link || `https://letterboxd.com/${USERNAME}/`;
-  document.getElementById('modal-overlay').classList.add('open');
-}
+    function openModal(entry) {
+      if (typeof entry === 'string') entry = JSON.parse(entry);
+      document.getElementById('modal-img').src = entry.poster || '';
+      document.getElementById('modal-img').style.display = entry.poster ? 'block' : 'none';
+      document.getElementById('modal-title').textContent = entry.title;
+      document.getElementById('modal-meta').textContent = [entry.year, entry.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })].filter(Boolean).join(' · ');
+      document.getElementById('modal-rating').textContent = entry.rating ? starsFromRating(entry.rating) + ` (${entry.rating})` : 'No rating';
+      document.getElementById('modal-link').href = entry.link || `https://letterboxd.com/${USERNAME}/`;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
 
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-}
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
 
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
-});
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeModal();
+    });
 
-fetchDiary();
-</script>
+    fetchDiary();
+  </script>
 </body>
+
 </html>
