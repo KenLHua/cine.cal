@@ -220,20 +220,28 @@
   }
   .cal-cell.today { border-color: var(--accent2); box-shadow: 0 0 12px rgba(255,128,64,0.18); }
 
+  .has-movies .day-num {
+  color: var(--text);
+  /* Use a soft radial or solid background centered on the text */
+  background: rgba(0, 0, 0, 0.4); 
+  backdrop-filter: blur(4px); /* Optional: makes the text pop even more */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+
+
   .day-num {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* Create the top-down gradient shadow for readability */
-  background: linear-gradient(rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 30%, transparent 100%);
-  color: var(--text);
+  top: 8px; /* Offset from the top */
+  left: 10px; /* Offset from the left */
+  color: var(--muted);
   font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  padding: 6px 8px 15px; /* Extra bottom padding for the gradient spread */
-  z-index: 5; /* Ensure it stays above the poster image */
-  pointer-events: none; /* Allows clicks to pass through to the poster below */
-  margin-bottom: 0;
+  font-size: 0.72rem;
+  padding: 2px 6px; /* Tight padding around the text */
+  border-radius: 4px; /* Slight rounding for the background */
+  z-index: 5;
+  pointer-events: none;
+  width: max-content; /* Ensure the background only wraps the text */
 }
   .cal-cell.today .day-num {
   color: var(--accent2);
