@@ -734,57 +734,60 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 15px; /* Tighter header */
+  }
 
-      .header-right {
-        width: 100%;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 
-      .month-nav {
-        flex-direction: column;
-        gap: 12px;
-        padding: 16px 12px;
-      }
+  /* 1. Maximize Width: Use 100% of the screen */
+  .calendar-wrap {
+    padding: 10px 4px; /* Tiny side padding gives more room to cells */
+    max-width: 100%;
+    margin: 0;
+  }
 
-      .month-title {
-        font-size: 1.4rem;
-      }
+  /* 2. Reduce Gaps: Saves about 30px of horizontal space */
+  .calendar-grid {
+    gap: 3px; 
+  }
 
-      .stats-bar {
-        position: static;
-        transform: none;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 16px;
-      }
+  /* 3. Change Shape: A 1/1.4 ratio is wider than 2/3 */
+  .cal-cell {
+    aspect-ratio: 1 / 1.4; 
+    border-radius: 6px;
+    padding: 0; /* Let images fill the cell entirely */
+  }
 
-      .calendar-wrap,
-      .year-view-wrap {
-        padding: 16px 12px 48px;
-      }
+  /* 4. Text adjustments */
+  .day-num {
+    font-size: 0.6rem;
+    top: 2px;
+    left: 2px;
+    padding: 1px 3px;
+    background: rgba(0, 0, 0, 0.6); /* Higher contrast */
+  }
 
-      .month-nav,
-      .year-title-row {
-        padding: 24px 12px 16px;
-      }
+  .month-title {
+    font-size: 1.4rem;
+    min-width: auto;
+  }
 
-      .stats-bar,
-      .year-stats-bar {
-        padding: 16px 12px 0;
-        gap: 20px;
-      }
-
-      .year-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+  .stats-bar {
+    position: static;
+    transform: none;
+    justify-content: center;
+    gap: 12px;
+  }
+}
   </style>
 </head>
 
