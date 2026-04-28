@@ -350,10 +350,11 @@
       transition: transform 0.2s;
       width: 100%;
       height: 100%;
+      will-change: transform, clip-path;
     }
 
     .movie-thumb:hover {
-      transform: scale(1.03);
+      transform: scale(1.5);
       z-index: 10;
     }
 
@@ -788,6 +789,55 @@
     gap: 12px;
   }
 }
+/* Base stack behavior */
+.movie-poster-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+}
+
+/* THE DIAGONAL SPLIT: For exactly 2 movies */
+.movie-poster-stack.count-2 {
+  display: block; /* Disable grid for the split view */
+}
+
+.movie-poster-stack.count-2 .movie-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0; /* Let the parent .cal-cell handle the rounding */
+}
+
+/* The bottom-right movie */
+.movie-poster-stack.count-2 .movie-thumb:nth-child(1) {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  z-index: 2;
+}
+
+/* The top-left movie */
+.movie-poster-stack.count-2 .movie-thumb:nth-child(2) {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  z-index: 1;
+}
+
+/* Hover effect: Bring the hovered poster to the front and show full image */
+.movie-poster-stack.count-2 .movie-thumb:hover {
+  clip-path: none;
+  z-index: 10;
+  transform: scale(1.5);
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+/* Keep 3 and 4 movies as standard grids */
+.movie-poster-stack.count-3 { grid-template-rows: repeat(3, 1fr); }
+.movie-poster-stack.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .cal-cell:has(.movie-thumb:hover) {
+  z-index: 100;         /* Raise the entire cell above its neighbors */
+  overflow: visible;    /* CRITICAL: Allows the poster to grow outside the cell */
+}
   </style>
 </head>
 
@@ -890,7 +940,9 @@
 
       // Calculate difference in milliseconds and convert to full days
       const diffTime = Math.abs(today - lastEntryDate);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const d1 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const d2 = new Date(lastEntryDate.getFullYear(), lastEntryDate.getMonth(), lastEntryDate.getDate());
+      const diffDays = Math.floor((d1 - d2) / (1000 * 60 * 60 * 24));;
 
       document.getElementById('days-since').textContent = diffDays;
     }
